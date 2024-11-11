@@ -1,0 +1,53 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+#Juego {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    background-color: #e6f7ff;
+    border: 2px solid #333;
+    overflow: hidden;
+}
+#cubo {
+    position: absolute;
+    bottom: 10px;
+    width: 60px;
+    height: 30px;
+    background-color: #ff6b6b;
+    border-radius: 5px;
+}
+.okas {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ffcc00;
+    border-radius: 50%;
+}
+#Puntos, #Vidas {
+    position: absolute;
+    top: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+#Puntos {
+    left: 10px;
+}
+#Vidas {
+    right: 10px;
+}
+.enemigo {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ff0000;
+    border-radius: 5%; 
+}
+
