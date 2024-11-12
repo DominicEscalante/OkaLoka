@@ -10,7 +10,10 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #e5dbff;
+    background-color: #000; /* Color de fondo para cargar antes de la imagen */
+    background-image: url("imagenes/nebulosa.jpg"); /* Imagen de fondo de estrellas */
+    background-size: cover;
+    background-position: center;
     font-family: Arial, sans-serif;
     overflow: hidden;
 }
@@ -24,7 +27,7 @@ body {
 
 /* Estilo del logo */
 #logo {
-    width: 100px; /* Ajusta el tamaño del logo según sea necesario */
+    width: 70px; /* Ajusta el tamaño del logo según sea necesario */
 }
 
 /* Área de juego */
@@ -45,10 +48,11 @@ body {
 #bowl {
     position: absolute;
     bottom: 3%;
-    width: 15%;
+    width: 17%;
     height: 5%;
     background-color: #e89a4d;
     border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .item {
