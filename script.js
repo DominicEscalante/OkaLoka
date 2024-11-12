@@ -1,121 +1,105 @@
-const Juego = document.getElementById('Juego');
-const cubo = document.getElementById('cubo');
-const Puntos = document.getElementById('Puntos');
-const Vidas = document.getElementById('Vidas');
-const velocidadCubo = 30;
-let puntuacion = 0;
-let vidas = 3;
-let velocidadOka = 3;
-let intervaloOka = 1000;
+const gameArea = document.getElementById("gameArea");
+const bowl = document.getElementById("bowl");
+const scoreDisplay = document.getElementById("score");
+const livesDisplay = document.getElementById("lives");
+const gameOverMessage = document.getElementById("gameOverMessage");
 
-document.addEventListener('keydown', (e) => {
-    const rectCubo = cubo.getBoundingClientRect();
-    if (e.key === 'ArrowLeft' && rectCubo.left > Juego.getBoundingClientRect().left) {
-        cubo.style.left = `${rectCubo.left - velocidadCubo - Juego.getBoundingClientRect().left}px`;
-    }
-    if (e.key === 'ArrowRight' && rectCubo.right < Juego.getBoundingClientRect().right) {
-        cubo.style.left = `${rectCubo.left + velocidadCubo - Juego.getBoundingClientRect().left}px`;
-    }
+let score = 0;
+let lives = 3;
+let gameInterval;
+let gameActive = true; // Variable para controlar si el juego está activo
+
+// Move bowl with touch
+gameArea.addEventListener("touchmove", (event) => {
+    if (!gameActive) return; // Evita el movimiento si el juego ha terminado
+    const touch = event.touches[0];
+    let bowlX = touch.clientX - gameArea.offsetLeft - bowl.offsetWidth / 2;
+    bowlX = Math.max(0, Math.min(gameArea.offsetWidth - bowl.offsetWidth, bowlX));
+    bowl.style.left = bowlX + "px";
 });
 
-function crearOka() {
-    const oka = document.createElement('div');
-    oka.classList.add('okas');
-    oka.style.left = `${Math.floor(Math.random() * (Juego.clientWidth - 20))}px`;
-    Juego.appendChild(oka);
-    soltarOka(oka);
-}
+const badItemImages = ["imagenes/brocoli.png", "imagenes/zanahoria.png", "imagenes/tomate.png"];
+// Create falling items
+function createItem() {
+    if (!gameActive) return; // Evita crear nuevos elementos si el juego ha terminado
+    const item = document.createElement("div");
+    item.classList.add("item");
 
-function soltarOka(oka) {
-    let caidaOka = setInterval(() => {
-        oka.style.top = `${(parseInt(oka.style.top) || 0) + velocidadOka}px`;
+    // Randomizar el tipo de item (bueno o malo)
+    if (Math.random() < 0.6) {
+        item.classList.add("okaLoka");
+        item.style.backgroundColor = "#ff5a5a"; // Color para el item bueno
+    } else {
+        item.classList.add("badItem");
 
-        const rectOka = oka.getBoundingClientRect();
-        const rectCubo = cubo.getBoundingClientRect();
+        // Asignar una imagen aleatoria a los elementos malos
+        const randomIndex = Math.floor(Math.random() * badItemImages.length);
+        item.style.backgroundImage = `url(${badItemImages[randomIndex]})`;
+        item.style.backgroundSize = "cover"; // Ajustar la imagen al tamaño del elemento
+    }
 
-        if (
-            rectOka.bottom >= rectCubo.top &&
-            rectOka.left >= rectCubo.left &&
-            rectOka.right <= rectCubo.right
-        ) {
-            puntuacion++;
-            Puntos.innerText = `Puntuación: ${puntuacion}`;
-            oka.remove();
-            clearInterval(caidaOka);
+    // Posición inicial aleatoria
+    const margin = 80; // Ajusta este valor según el margen deseado en píxeles
+    const maxLeftPosition = gameArea.offsetWidth - item.offsetWidth - margin;
+    item.style.left = Math.max(margin, Math.random() * maxLeftPosition) + "px";
+    item.style.top = "0px";
+    gameArea.appendChild(item);
 
-            if (puntuacion > 30) {
-                aumentarDificultad();
+    // Hacer que el item caiga
+    let fallInterval = setInterval(() => {
+        if (!gameActive) {
+            clearInterval(fallInterval); // Detener la caída si el juego ha terminado
+            return;
+        }
+        
+        let itemTop = parseFloat(item.style.top);
+        item.style.top = itemTop + (gameArea.offsetHeight * 0.015) + "px";
+
+        // Comprobar si el item toca el recipiente
+        if (itemTop >= gameArea.offsetHeight - bowl.offsetHeight - item.offsetHeight) {
+            const bowlLeft = parseFloat(bowl.style.left);
+            const bowlRight = bowlLeft + bowl.offsetWidth;
+            const itemLeft = parseFloat(item.style.left);
+            const itemRight = itemLeft + item.offsetWidth;
+
+            if (itemLeft < bowlRight && itemRight > bowlLeft) {
+                if (item.classList.contains("okaLoka")) {
+                    score += 10;
+                    scoreDisplay.textContent = "Puntos: " + score;
+                } else {
+                    lives -= 1;
+                    livesDisplay.textContent = "Vidas: " + lives;
+                    if (lives === 0) {
+                        endGame();
+                    }
+                }
+                if (item.parentNode) {
+                    item.remove(); // Eliminar el elemento solo si aún está en el DOM
+                }
+                clearInterval(fallInterval);
             }
         }
 
-        if (rectOka.top > Juego.clientHeight) {
-            oka.remove();
-            clearInterval(caidaOka);
-            vidas--;
-            Vidas.innerText = `Vidas: ${vidas}`;
-
-            if (vidas <= 0) {
-                alert("¡Juego Terminado! Puntuación Final: " + puntuacion);
-                reiniciarJuego();
+        // Eliminar el item si sale de los límites
+        if (itemTop > gameArea.offsetHeight) {
+            if (item.parentNode) {
+                item.remove();
             }
-        }
-    }, 30);
-}
-function crearEnemigo() {
-    const enemigo = document.createElement('div');
-    enemigo.classList.add('enemigo');
-    enemigo.style.left = `${Math.floor(Math.random() * (Juego.clientWidth - 20))}px`;
-    Juego.appendChild(enemigo);
-    soltarEnemigo(enemigo);
-}
-
-function soltarEnemigo(enemigo) {
-    let caidaEnemigo = setInterval(() => {
-        enemigo.style.top = `${(parseInt(enemigo.style.top) || 0) + velocidadOka}px`;
-
-        const rectEnemigo = enemigo.getBoundingClientRect();
-        const rectCubo = cubo.getBoundingClientRect();
-
-        if (
-            rectEnemigo.bottom >= rectCubo.top &&
-            rectEnemigo.left >= rectCubo.left &&
-            rectEnemigo.right <= rectCubo.right
-        ) {
-            vidas--;
-            Vidas.innerText = `Vidas: ${vidas}`;
-            enemigo.remove();
-            clearInterval(caidaEnemigo);
-
-            if (vidas <= 0) {
-                alert("¡Juego Terminado! Puntuación Final: " + puntuacion);
-                reiniciarJuego();
-            }
-        }
-
-        if (rectEnemigo.top > Juego.clientHeight) {
-            enemigo.remove();
-            clearInterval(caidaEnemigo);
+            clearInterval(fallInterval);
         }
     }, 30);
 }
 
-function aumentarDificultad() {
-    velocidadOka = 7; 
-    intervaloOka = 700;
+// End game
+function endGame() {
+    gameActive = false; // Detiene todas las acciones del juego
+    clearInterval(gameInterval); // Detiene el intervalo de creación de elementos
+    gameOverMessage.style.display = "block";
+
+    // Remove all items from the game area
+    const items = document.querySelectorAll(".item");
+    items.forEach(item => item.remove());
 }
 
-function reiniciarJuego() {
-    puntuacion = 0;
-    vidas = 3;
-    velocidadOka = 5;
-    intervaloOka = 1000;
-    Puntos.innerText = `Puntuación: ${puntuacion}`;
-    Vidas.innerText = `Vidas: ${vidas}`;
-}
-
-function iniciarJuego() {
-    setInterval(crearOka, intervaloOka);
-    setInterval(crearEnemigo, intervaloOka * 2); 
-}
-
-iniciarJuego();
+// Start game loop
+gameInterval = setInterval(createItem, 1000);

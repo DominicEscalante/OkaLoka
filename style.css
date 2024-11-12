@@ -1,53 +1,88 @@
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: 0;
-    background-color: #f0f0f0;
-    overflow: hidden;
+    background-color: #e5dbff;
     font-family: Arial, sans-serif;
+    overflow: hidden;
 }
-#Juego {
+
+/* Contenedor general */
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Estilo del logo */
+#logo {
+    width: 100px; /* Ajusta el tamaño del logo según sea necesario */
+}
+
+/* Área de juego */
+#gameArea {
     position: relative;
-    width: 400px;
-    height: 600px;
-    background-color: #e6f7ff;
+    width: 98vw;
+    max-width: 500px;
+    height: 90vh;
+    max-height: 800px;
+    background-image: url("imagenes/background.jpg");
+    background-size: cover;
+    background-position: center;
     border: 2px solid #333;
     overflow: hidden;
 }
-#cubo {
+
+/* Estilos del recipiente y elementos del juego */
+#bowl {
     position: absolute;
-    bottom: 10px;
-    width: 60px;
-    height: 30px;
-    background-color: #ff6b6b;
-    border-radius: 5px;
-}
-.okas {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: #ffcc00;
-    border-radius: 50%;
-}
-#Puntos, #Vidas {
-    position: absolute;
-    top: 10px;
-    font-size: 20px;
-    font-weight: bold;
-}
-#Puntos {
-    left: 10px;
-}
-#Vidas {
-    right: 10px;
-}
-.enemigo {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: #ff0000;
-    border-radius: 5%; 
+    bottom: 3%;
+    width: 15%;
+    height: 5%;
+    background-color: #e89a4d;
+    border-radius: 10px;
 }
 
+.item {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+}
+
+.okaLoka {
+    background-color: #ff5a5a;
+}
+
+#score, #lives {
+    position: absolute;
+    top: 1%;
+    font-size: 4vw;
+    color: #fffcfc;
+}
+
+#score {
+    left: 3%;
+}
+
+#lives {
+    right: 3%;
+}
+
+#gameOverMessage {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6vw;
+    color: #ff5a5a;
+    text-align: center;
+}
