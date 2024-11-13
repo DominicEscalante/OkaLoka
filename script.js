@@ -19,6 +19,7 @@ gameArea.addEventListener("touchmove", (event) => {
 });
 
 const badItemImages = ["imagenes/brocoli.png", "imagenes/zanahoria.png", "imagenes/tomate.png"];
+const goodItemImages = ["imagenes/morado.png", "imagenes/rosa.png"];
 // Create falling items
 function createItem() {
     if (!gameActive) return; // Evita crear nuevos elementos si el juego ha terminado
@@ -27,14 +28,16 @@ function createItem() {
 
     // Randomizar el tipo de item (bueno o malo)
     if (Math.random() < 0.6) {
-        item.classList.add("okaLoka");
-        item.style.backgroundColor = "#ff5a5a"; // Color para el item bueno
+        // Asignar una imagen aleatoria a los elementos buenos
+        const randomGoodIndex = Math.floor(Math.random() * goodItemImages.length);
+        item.style.backgroundImage = `url(${goodItemImages[randomGoodIndex]})`;
+        item.style.backgroundSize = "cover"; // Ajustar la imagen al tamaño del elemento
     } else {
         item.classList.add("badItem");
 
         // Asignar una imagen aleatoria a los elementos malos
-        const randomIndex = Math.floor(Math.random() * badItemImages.length);
-        item.style.backgroundImage = `url(${badItemImages[randomIndex]})`;
+        const randomBadIndex = Math.floor(Math.random() * badItemImages.length);
+        item.style.backgroundImage = `url(${badItemImages[randomBadIndex]})`;
         item.style.backgroundSize = "cover"; // Ajustar la imagen al tamaño del elemento
     }
 
@@ -51,7 +54,7 @@ function createItem() {
             clearInterval(fallInterval); // Detener la caída si el juego ha terminado
             return;
         }
-        
+
         let itemTop = parseFloat(item.style.top);
         item.style.top = itemTop + (gameArea.offsetHeight * 0.015) + "px";
 

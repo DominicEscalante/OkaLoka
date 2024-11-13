@@ -61,10 +61,6 @@ body {
     height: 100px;
 }
 
-.okaLoka {
-    background-color: #ff5a5a;
-}
-
 #score, #lives {
     position: absolute;
     top: 1%;
