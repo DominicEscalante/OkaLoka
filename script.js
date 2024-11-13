@@ -3,13 +3,46 @@ const bowl = document.getElementById("bowl");
 const scoreDisplay = document.getElementById("score");
 const livesDisplay = document.getElementById("lives");
 const gameOverMessage = document.getElementById("gameOverMessage");
+const welcomeScreen = document.getElementById("welcomeScreen");
+const speechBubble = document.getElementById("speechBubble");
+const welcomeCharacter = document.getElementById("welcomeCharacter");
 
 let score = 0;
 let lives = 3;
 let gameInterval;
-let gameActive = true; // Variable para controlar si el juego está activo
+let gameActive = false; // Variable para controlar si el juego está activo
+let welcomeStage = 1; // Variable para rastrear la etapa de bienvenida
 
-// Move bowl with touch
+// Función para avanzar en la bienvenida
+function advanceWelcome() {
+    if (welcomeStage === 1) {
+        speechBubble.textContent = "En una galaxia lejana y colorida....";
+        welcomeCharacter.src = "imagenes/morado.png";
+        welcomeStage = 2;
+    } else if (welcomeStage === 2) {
+        speechBubble.textContent = "Los dulces se aventuran al espacio en busca de nuevas delicias, pero....";
+        welcomeStage = 3;
+    } else if (welcomeStage === 3) {
+        speechBubble.textContent = "O no!! Las verduras espaciales, han llegado también! Liderados por el audaz Capitán Tomate";
+        welcomeStage = 4;
+    } else if (welcomeStage === 4) {
+        speechBubble.textContent = "Mis dulces y yo nos estamos preparando para la batalla, pero necesitamos ayuda! ¿Podrías ayudarnos a derrotar a las verduras?";
+        welcomeStage = 5; 
+    } else {
+        startGame(); 
+    }
+}
+// Función para iniciar el juego
+function startGame() {
+    welcomeScreen.style.display = "none"; // Oculta la pantalla de bienvenida
+    gameActive = true;
+    gameInterval = setInterval(createItem, 1000); // Empieza a crear elementos que caen
+}
+
+// Escucha el clic en la pantalla de bienvenida para avanzar o iniciar el juego
+welcomeScreen.addEventListener("click", advanceWelcome);
+
+// Mover el bowl con el toque
 gameArea.addEventListener("touchmove", (event) => {
     if (!gameActive) return; // Evita el movimiento si el juego ha terminado
     const touch = event.touches[0];
@@ -20,7 +53,8 @@ gameArea.addEventListener("touchmove", (event) => {
 
 const badItemImages = ["imagenes/brocoli.png", "imagenes/zanahoria.png", "imagenes/tomate.png"];
 const goodItemImages = ["imagenes/morado.png", "imagenes/rosa.png"];
-// Create falling items
+
+// Crea los elementos que caen
 function createItem() {
     if (!gameActive) return; // Evita crear nuevos elementos si el juego ha terminado
     const item = document.createElement("div");
@@ -31,18 +65,18 @@ function createItem() {
         // Asignar una imagen aleatoria a los elementos buenos
         const randomGoodIndex = Math.floor(Math.random() * goodItemImages.length);
         item.style.backgroundImage = `url(${goodItemImages[randomGoodIndex]})`;
-        item.style.backgroundSize = "cover"; // Ajustar la imagen al tamaño del elemento
+        item.style.backgroundSize = "cover";
     } else {
         item.classList.add("badItem");
 
         // Asignar una imagen aleatoria a los elementos malos
         const randomBadIndex = Math.floor(Math.random() * badItemImages.length);
         item.style.backgroundImage = `url(${badItemImages[randomBadIndex]})`;
-        item.style.backgroundSize = "cover"; // Ajustar la imagen al tamaño del elemento
+        item.style.backgroundSize = "cover";
     }
 
     // Posición inicial aleatoria
-    const margin = 80; // Ajusta este valor según el margen deseado en píxeles
+    const margin = 80;
     const maxLeftPosition = gameArea.offsetWidth - item.offsetWidth - margin;
     item.style.left = Math.max(margin, Math.random() * maxLeftPosition) + "px";
     item.style.top = "0px";
@@ -51,7 +85,7 @@ function createItem() {
     // Hacer que el item caiga
     let fallInterval = setInterval(() => {
         if (!gameActive) {
-            clearInterval(fallInterval); // Detener la caída si el juego ha terminado
+            clearInterval(fallInterval);
             return;
         }
 
@@ -66,7 +100,7 @@ function createItem() {
             const itemRight = itemLeft + item.offsetWidth;
 
             if (itemLeft < bowlRight && itemRight > bowlLeft) {
-                if (item.classList.contains("okaLoka")) {
+                if (!item.classList.contains("badItem")) {
                     score += 10;
                     scoreDisplay.textContent = "Puntos: " + score;
                 } else {
@@ -77,7 +111,7 @@ function createItem() {
                     }
                 }
                 if (item.parentNode) {
-                    item.remove(); // Eliminar el elemento solo si aún está en el DOM
+                    item.remove();
                 }
                 clearInterval(fallInterval);
             }
@@ -93,7 +127,7 @@ function createItem() {
     }, 30);
 }
 
-// End game
+// Termina el juego
 function endGame() {
     gameActive = false; // Detiene todas las acciones del juego
     clearInterval(gameInterval); // Detiene el intervalo de creación de elementos
@@ -103,6 +137,3 @@ function endGame() {
     const items = document.querySelectorAll(".item");
     items.forEach(item => item.remove());
 }
-
-// Start game loop
-gameInterval = setInterval(createItem, 1000);
