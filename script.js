@@ -1,3 +1,4 @@
+// Variables para los elementos
 const gameArea = document.getElementById("gameArea");
 const bowl = document.getElementById("bowl");
 const scoreDisplay = document.getElementById("score");
@@ -8,16 +9,17 @@ const speechBubble = document.getElementById("speechBubble");
 const welcomeCharacter = document.getElementById("welcomeCharacter");
 const introVideo = document.getElementById("introVideo");
 
-
 let score = 0;
 let lives = 3;
 let gameInterval;
-let gameActive = false; // Variable para controlar si el juego está activo
-let welcomeStage = 1; // Variable para rastrear la etapa de bienvenida
+let gameActive = false;
+let welcomeStage = 1;
+let congratulated = false; // Variable para controlar la felicitación
+let couponStage = false; // Nueva variable para controlar la pantalla de cupón
 
 introVideo.addEventListener("ended", () => {
     introVideo.style.display = "none"; 
-    welcomeScreen.style.display = "flex"; // Muestra la pantalla de bienvenida
+    welcomeScreen.style.display = "flex"; 
 });
 
 // Función para avanzar en la bienvenida
@@ -39,19 +41,26 @@ function advanceWelcome() {
         startGame(); 
     }
 }
+
 // Función para iniciar el juego
 function startGame() {
-    welcomeScreen.style.display = "none"; // Oculta la pantalla de bienvenida
+    welcomeScreen.style.display = "none"; 
     gameActive = true;
-    gameInterval = setInterval(createItem, 1000); // Empieza a crear elementos que caen
+    gameInterval = setInterval(createItem, 1000); 
 }
 
 // Escucha el clic en la pantalla de bienvenida para avanzar o iniciar el juego
-welcomeScreen.addEventListener("click", advanceWelcome);
+welcomeScreen.addEventListener("click", () => {
+    if (congratulated) {
+        showCoupon(); // Mostrar el cupón si el usuario ya ha sido felicitado
+    } else {
+        advanceWelcome();
+    }
+});
 
 // Mover el bowl con el toque
 gameArea.addEventListener("touchmove", (event) => {
-    if (!gameActive) return; // Evita el movimiento si el juego ha terminado
+    if (!gameActive) return;
     const touch = event.touches[0];
     let bowlX = touch.clientX - gameArea.offsetLeft - bowl.offsetWidth / 2;
     bowlX = Math.max(0, Math.min(gameArea.offsetWidth - bowl.offsetWidth, bowlX));
@@ -61,35 +70,29 @@ gameArea.addEventListener("touchmove", (event) => {
 const badItemImages = ["imagenes/brocoli.png", "imagenes/zanahoria.png", "imagenes/tomate.png"];
 const goodItemImages = ["imagenes/morado.png", "imagenes/rosa.png"];
 
-// Crea los elementos que caen
+// Función para crear elementos que caen
 function createItem() {
-    if (!gameActive) return; // Evita crear nuevos elementos si el juego ha terminado
+    if (!gameActive) return;
     const item = document.createElement("div");
     item.classList.add("item");
 
-    // Randomizar el tipo de item (bueno o malo)
     if (Math.random() < 0.6) {
-        // Asignar una imagen aleatoria a los elementos buenos
         const randomGoodIndex = Math.floor(Math.random() * goodItemImages.length);
         item.style.backgroundImage = `url(${goodItemImages[randomGoodIndex]})`;
         item.style.backgroundSize = "cover";
     } else {
         item.classList.add("badItem");
-
-        // Asignar una imagen aleatoria a los elementos malos
         const randomBadIndex = Math.floor(Math.random() * badItemImages.length);
         item.style.backgroundImage = `url(${badItemImages[randomBadIndex]})`;
         item.style.backgroundSize = "cover";
     }
 
-    // Posición inicial aleatoria
     const margin = 80;
     const maxLeftPosition = gameArea.offsetWidth - item.offsetWidth - margin;
     item.style.left = Math.max(margin, Math.random() * maxLeftPosition) + "px";
     item.style.top = "0px";
     gameArea.appendChild(item);
 
-    // Hacer que el item caiga
     let fallInterval = setInterval(() => {
         if (!gameActive) {
             clearInterval(fallInterval);
@@ -99,7 +102,6 @@ function createItem() {
         let itemTop = parseFloat(item.style.top);
         item.style.top = itemTop + (gameArea.offsetHeight * 0.015) + "px";
 
-        // Comprobar si el item toca el recipiente
         if (itemTop >= gameArea.offsetHeight - bowl.offsetHeight - item.offsetHeight) {
             const bowlLeft = parseFloat(bowl.style.left);
             const bowlRight = bowlLeft + bowl.offsetWidth;
@@ -110,6 +112,7 @@ function createItem() {
                 if (!item.classList.contains("badItem")) {
                     score += 10;
                     scoreDisplay.textContent = "Puntos: " + score;
+                    checkForCongratulations(); 
                 } else {
                     lives -= 1;
                     livesDisplay.textContent = "Vidas: " + lives;
@@ -124,7 +127,6 @@ function createItem() {
             }
         }
 
-        // Eliminar el item si sale de los límites
         if (itemTop > gameArea.offsetHeight) {
             if (item.parentNode) {
                 item.remove();
@@ -134,13 +136,60 @@ function createItem() {
     }, 30);
 }
 
-// Termina el juego
+// Función para verificar si la puntuación alcanza 300
+function checkForCongratulations() {
+    if (score >= 300 && !congratulated) {
+        congratulated = true;
+        showCongratulations(); 
+    }
+}
+
+// Función para mostrar el mensaje de felicitaciones
+function showCongratulations() {
+    gameActive = false; // Pausar el juego temporalmente
+    clearInterval(gameInterval);
+
+    // Configurar y mostrar la pantalla de felicitación
+    speechBubble.textContent = "¡Felicidades!";
+    welcomeCharacter.src = "imagenes/rosa.png";
+    welcomeScreen.style.display = "flex";
+}
+
+// Función para mostrar el mensaje de agradecimiento y el cupón
+function showCoupon() {
+    speechBubble.textContent = "Gracias por ayudarnos. ¡Ten este cupón!";
+    welcomeCharacter.src = "imagenes/rosa.png";
+    welcomeScreen.style.display = "flex";
+    couponStage = true;
+}
+
+// Función para terminar el juego
 function endGame() {
-    gameActive = false; // Detiene todas las acciones del juego
-    clearInterval(gameInterval); // Detiene el intervalo de creación de elementos
+    gameActive = false;
+    clearInterval(gameInterval);
     gameOverMessage.style.display = "block";
 
-    // Remove all items from the game area
     const items = document.querySelectorAll(".item");
     items.forEach(item => item.remove());
+}
+function showCoupon() {
+    speechBubble.textContent = "Gracias por ayudarnos. ¡Ten este cupón!";
+    welcomeCharacter.src = "imagenes/rosa.png";
+    welcomeScreen.style.display = "flex";
+    couponStage = true;
+
+    // Set the QR code image source and make it visible
+    const qrCode = document.getElementById("qrCode");
+    qrCode.src = "imagenes/logo.png"; // Replace with actual path to the QR code image
+    qrCode.style.display = "block";
+    welcomeScreen.addEventListener("click", showEndVideo);
+}
+
+function showEndVideo() {
+    welcomeScreen.style.display = "none";
+
+    const endVideo = document.getElementById("endVideo");
+    endVideo.style.display = "block";
+    endVideo.play();
+    welcomeScreen.removeEventListener("click", showEndVideo);
 }
