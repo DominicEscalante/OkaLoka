@@ -6,12 +6,19 @@ const gameOverMessage = document.getElementById("gameOverMessage");
 const welcomeScreen = document.getElementById("welcomeScreen");
 const speechBubble = document.getElementById("speechBubble");
 const welcomeCharacter = document.getElementById("welcomeCharacter");
+const introVideo = document.getElementById("introVideo");
+
 
 let score = 0;
 let lives = 3;
 let gameInterval;
 let gameActive = false; // Variable para controlar si el juego está activo
 let welcomeStage = 1; // Variable para rastrear la etapa de bienvenida
+
+introVideo.addEventListener("ended", () => {
+    introVideo.style.display = "none"; 
+    welcomeScreen.style.display = "flex"; // Muestra la pantalla de bienvenida
+});
 
 // Función para avanzar en la bienvenida
 function advanceWelcome() {
