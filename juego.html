@@ -11,20 +11,23 @@
       <source src="imagenes/inicio.mp4" type="video/mp4" />
     </video>
     <div id="welcomeScreen" style="display: none;">
-      <div id="speechBubble">¡Bienvenido!</div>
-      <img src="imagenes/rosa.png" id="welcomeCharacter" />
+      <div id="speechBubble">¡Bienvenido, soldado!</div>
+      <img src="imagenes/OkaMilitar.png" id="welcomeCharacter" />
       <img src="" id="qrCode" style="display: none; width: 150px; margin-top: 20px;" />
     </div>
     <video id="endVideo" style="display: none; width: 100vw; height: 100vh;" autoplay muted>
-        <source src="imagenes/fin.mp4" type="video/mp4" />
+        <source src="imagenes/finMod.mp4" type="video/mp4" />
       </video>
     <div id="container">
       <img src="imagenes/logo.png" alt="Logo de OkaLoka" id="logo" />
       <div id="gameArea">
+        <div id="damageOverlay"></div>
         <div id="score">Puntos: 0</div>
         <div id="lives">Vidas: 3</div>
-        <div id="bowl"></div>
-        <div id="gameOverMessage">¡Juego Terminado!</div>
+        <div id="bowlContainer">
+          <div id="bowl"></div>
+        </div>
+        <div id="gameOverMessage">¡Juego Terminado, fracasaste en tu misión!</div>
       </div>
     </div>
     <script src="script.js"></script>
